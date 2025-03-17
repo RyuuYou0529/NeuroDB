@@ -1,0 +1,39 @@
+[project]
+name = "neurodb"
+version = "0.1"
+description = "NeuroDB"
+authors = [
+    { name="Yang Liu", email="ryuuyou0529@163.com" },
+    { name="Rubin Zhao", email="beanli161514@gmail.com" },
+]
+license = { text = "GPL-3.0-or-later" }
+readme = "README.md"
+requires-python = ">=3.8"
+
+classifiers = [
+    "Programming Language :: Python :: 3"
+]
+
+dependencies = [
+    'numpy',
+    'h5py',
+    'zarr',
+    'tifffile',
+    'networkx',
+    'pandas',
+    'datajoint',
+    'tqdm',
+]
+
+[tool.setuptools.packages.find]
+include = ["neurodb", "neurodb.*"]
+
+[options.extras_require]
+pytorch = ["torch"]
+
+[options.packages.find]
+where = "neurodb"
+
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"

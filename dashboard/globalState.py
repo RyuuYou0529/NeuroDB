@@ -1,11 +1,10 @@
-import streamlit as st
 import datajoint as dj
+import streamlit as st
 
 from neurodb import NeuroDB
 
 class globalState:
     def __init__(self):
-        self.authenticated = False
         self.refresh()
         
     def refresh(self):
@@ -23,9 +22,7 @@ class globalState:
 
         self.neurodb = None
     
-    def connected(self, username, password):
-        self.db_config['username'] = username
-        self.db_config['password'] = password
+    def connected(self):
         self.conn = dj.conn(
             host=self.db_config['url'],
             user=self.db_config['username'], 
@@ -46,7 +43,7 @@ class globalState:
             ORDER BY SCHEMA_NAME
         """
         db_name_list = self.conn.query(query).fetchall()
-        db_name_list = [db[0] for db in db_name_list]
+        db_name_list = [None] + [db[0] for db in db_name_list]
         self.db_name_list = db_name_list
         return self.db_name_list
 
@@ -57,37 +54,3 @@ class globalState:
             return self.neurodb
         else:
             return None
-
-# Login Page
-def login():
-    st.title("Login Page")
-    
-    username = st.text_input("Username", value='root')
-    password = st.text_input("Password", type="password", value='neurodb')
-    
-    if st.button("Login"):
-        if st.session_state.GLOBAL.connected(username, password):
-            st.success("Login successful!")
-            st.rerun()
-        else:
-            st.error("Invalid username or password")
-
-def logout():
-    st.session_state.GLOBAL.refresh()
-    st.rerun()
-
-st.session_state.GLOBAL: globalState # type: ignore
-if 'GLOBAL' not in st.session_state:
-    st.session_state.GLOBAL = globalState()
-
-home_page = st.Page("home.py", title="Homepage")
-dashboard_page = st.Page("dashboard.py", title="Dashboard")
-logout_page = st.Page(logout, title="Log out", icon=":material/logout:")
-
-if st.session_state.GLOBAL.authenticated:
-    pg = st.navigation({'Home': [home_page, dashboard_page], 'Logout': [logout_page]})
-    st.session_state.GLOBAL.update_db_name_list()
-else:
-    pg = st.navigation([st.Page(login)])
-
-pg.run()
